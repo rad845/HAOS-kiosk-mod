@@ -257,8 +257,8 @@ for status_path in /sys/class/drm/card[0-9]*-*/status; do
     printf "%-25s%-20s%s\n" "$card_port" "$driver" "$status"
 done
 if [ -z "$selected_card" ]; then
-    bashio::log.info "ERROR: No connected video card detected. Exiting.."
-    exit 1
+    bashio::log.warning "WARNING: No connected video card detected, but continuing anyway..."
+    selected_card="card0"  # Wymuś użycie card0
 fi
 
 #### Start Xorg in the background
