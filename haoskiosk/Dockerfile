@@ -6,7 +6,8 @@
 # Date: September 2025
 ################################################################################
 
-FROM alpine:3.22
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 # Install Luakit and necessary dependencies
 RUN apk update && apk add --no-cache \
