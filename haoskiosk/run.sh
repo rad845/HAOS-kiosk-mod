@@ -158,6 +158,25 @@ if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
 fi
 bashio::log.info "DBus started with: DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
 export DBUS_SESSION_BUS_ADDRESS
+
+# ========== DODAJ TUTAJ ==========
+# VAAPI for Intel N100 GPU
+export LIBVA_DRIVER_NAME=iHD
+export GST_VAAPI_ALL_DRIVERS=1
+
+# GPU Diagnostics
+bashio::log.info "=== GPU ACCELERATION ==="
+bashio::log.info "Intel N100 detected - using iHD driver"
+bashio::log.info "Checking GPU hardware..."
+lspci | grep -i vga || bashio::log.warning "Cannot check GPU hardware"
+bashio::log.info "VAAPI info:"
+command -v vainfo >/dev/null 2>&1 && vainfo || bashio::log.warning "vainfo not available"
+bashio::log.info "========================="
+# =================================
+
+#Make available to subsequent shells
+echo "export DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS'" >> "$HOME/.profile"
+
 #Make available to subsequent shells
 echo "export DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS'" >> "$HOME/.profile"
 
