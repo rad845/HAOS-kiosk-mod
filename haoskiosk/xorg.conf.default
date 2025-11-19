@@ -17,6 +17,7 @@ Section "Device"
     Identifier		"Card0"
     Driver      	"modesetting"
     Option      	"DRI" "3"
+    Option "AccelMethod" "glamor"
 EndSection
 
 Section "Monitor"
