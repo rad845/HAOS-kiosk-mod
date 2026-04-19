@@ -15,55 +15,38 @@ ENV ADDON_VERSION=${BUILD_VERSION}
 #===============================================================================
 ##### Install X, Browser and all necessary dependencies
 RUN apk update && apk upgrade && apk add --no-cache \
-## Xserver and graphics
      xorg-server \
      xf86-video-modesetting \
      mesa-dri-gallium \
      mesa-egl \
      mesa-gles \
      libdrm \
-### X utils
      xdotool \
      xinput \
      xrandr \
      xset \
-#     xev \
      libxkbcommon \
      setxkbmap \
-### Input, udev
      xf86-input-libinput \
      libinput \
-#     libinput-tools \
      udev \
      libinput-udev \
      libevdev \
      evtest \
-### Window, mouse, keyboard management
      openbox \
      onboard \
      unclutter-xfixes \
      ttf-dejavu \
-### Linux utils
      bash \
      util-linux \
      patch \
      scrot \
-### Full Timezone info
      icu-data-full \
-### Python libraries
-    py3-pip \
-    py3-xlib \
-### Sound
+     py3-pip \
+     py3-xlib \
      pulseaudio-utils \
-#     alsa-utils alsa-plugins-pulse \
-### Video
-#     gstreamer-tools \
-#     gst-libav \
-### VNC (for debugging) - run: x11vnc -display :0 -forever & \
-      x11vnc \
-# Browser
-#    luakit \
-   && apk add --no-cache --repository=https://dl-cdn.alpinelinux.org/alpine/v3.21/community luakit=2.3.6-r0 \
+     x11vnc \
+     chromium \
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
