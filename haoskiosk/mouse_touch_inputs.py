@@ -1931,7 +1931,7 @@ class GestureCommand:
                 cmds_dict           = cmds_dict,
             )
 
-            prior_match = gesture_cmd.append_gesture_command_list(add_overridden)
+          prior_match = gesture_cmd.append_gesture_command_list(add_overridden)
           if prior_match is not None:
                 # Dodajemy pass, aby Python nie wywalał błędu wcięć
                 pass 
