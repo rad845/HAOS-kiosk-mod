@@ -14,7 +14,7 @@ ENV ADDON_VERSION=${BUILD_VERSION}
 
 #===============================================================================
 ##### Install X, Browser and all necessary dependencies
-RUN apk update && apk add --no-cache \
+RUN apk update && apk upgrade && apk add --no-cache \
 ## Xserver and graphics
      xorg-server \
      xf86-video-modesetting \
