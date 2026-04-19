@@ -68,7 +68,7 @@ RUN pip install --no-cache-dir  --break-system-packages aiohttp #Required for re
 
 #### Patches
 # Need to patch 'unique_instance.lua' so that new instance urls overwrite active url rather than add new tab
-COPY unique_instance.patch /usr/share/luakit/lib
-RUN patch -p2 /usr/share/luakit/lib/unique_instance.lua < /usr/share/luakit/lib/unique_instance.patch
+# COPY unique_instance.patch /usr/share/luakit/lib
+# RUN patch -p2 /usr/share/luakit/lib/unique_instance.lua < /usr/share/luakit/lib/unique_instance.patch
 
 CMD ["/run.sh"]
