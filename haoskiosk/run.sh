@@ -192,7 +192,7 @@ echo "export DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS'" >> "$HOME/.pr
 
 
 #### Start udev (used by X)
-bashio::log.info "Starting 'udevd' and (re-)triggering..."
+bashio::log.info "Starting 'udevd' and retriggering..."
 if ! udevd --daemon || ! udevadm trigger; then
     bashio::log.warning "WARNING: Failed to start udevd or trigger udev, input devices may not work"
 fi
