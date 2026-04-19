@@ -81,9 +81,8 @@ cleanup() {
 trap cleanup HUP INT QUIT ABRT TERM EXIT
 
 ################################################################################
-#### Variables
-BROWSER="luakit"
-BROWSER_FLAGS=
+BROWSER="chromium-browser"
+BROWSER_FLAGS="--kiosk --no-sandbox --user-data-dir=/data/browser --no-first-run 
 
 ################################################################################
 #### Get config variables from HA add-on & set environment variables
