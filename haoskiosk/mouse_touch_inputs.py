@@ -1932,10 +1932,7 @@ class GestureCommand:
             )
 
           prior_match = gesture_cmd.append_gesture_command_list(add_overridden)
-          if prior_match is not None:
-                # Dodajemy pass, aby Python nie wywalał błędu wcięć
-                pass 
-            if prior_match is None or add_overridden:
+          if prior_match is None or add_overridden:
                 debug(4, f"Loaded command for gesture: {gesture_cmd}")
                 return True
 
