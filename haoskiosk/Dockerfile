@@ -6,7 +6,7 @@
 # Date: April 2026
 ################################################################################
 
-ARG BUILD_FROM=homeassistant/amd64-base:7.3.3
+ARG BUILD_FROM=homeassistant/amd64-base:latest
 FROM $BUILD_FROM
 
 ARG BUILD_VERSION
