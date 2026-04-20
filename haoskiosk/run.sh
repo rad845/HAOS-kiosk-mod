@@ -330,8 +330,8 @@ mkdir -p ~/.config/openbox
 RC_XML=~/.config/openbox/rc.xml
 cp -a /etc/xdg/openbox/rc.xml "$RC_XML"
 # Delete selected old key bindings
-awk 'BEGIN{skip=0} /<keybind key="(C-A-Left|C-A-Right)">/{skip=1} /<\/keybind>/ && skip{skip=0; next} !skip{print}' "$RC_XML" > /tmp/rc.new.xml
-mv /tmp/rc.new.xml "$RC_XML"
+sed -i '/<keybind key="C-A-Left">/,/<\/keybind>/d' "$RC_XML"
+sed -i '/<keybind key="C-A-Right">/,/<\/keybind>/d' "$RC_XML"
 
 # Add new key bindings
 cat <<'EOF' > /tmp/new_keybinds.xml
