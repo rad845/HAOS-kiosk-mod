@@ -199,6 +199,9 @@ if ! udevd --daemon || ! udevadm trigger; then
 fi
 udevadm settle --timeout=10  #Wait for udev event processing to complete
 
+# Nadanie uprawnień do urządzeń wejściowych (Kluczowe dla dotyku!)
+chmod -R 777 /dev/input
+
 
 
 # Show discovered libinput devices
