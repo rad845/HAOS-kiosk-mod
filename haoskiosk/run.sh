@@ -638,12 +638,21 @@ if [ "$DEBUG_MODE" != true ]; then
     $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
     bashio::log.info "Launching $BROWSER browser(PID=$!): $HA_URL/$HA_DASHBOARD"
 
-    # Pętla monitorująca proces
+  # Pętla monitorująca proces
     while true; do
         if ! pgrep -x "chromium-browser" > /dev/null; then
             bashio::log.warning "Chromium process lost, cleaning locks and restarting in 5s..."
             sleep 5
-            rm -f /data/browser/SingletonLock
+            
+            # 1. CZYSZCZENIE BLOKAD (Naprawia 'existing session')
+            rm -rf /data/browser/Singleton*
+            rm -rf /tmp/.com.google.Chrome*
+            rm -rf /tmp/.org.chromium.Chromium*
+            
+            # 2. ODŚWIEŻENIE DOTYKU (Próba przywrócenia wch.cn TouchScreen)
+            udevadm trigger --subsystem-match=input --action=add >/dev/null 2>&1 || true
+            
+            # 3. RESTART
             $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
         else
             # Jeśli proces żyje, po prostu czekamy
