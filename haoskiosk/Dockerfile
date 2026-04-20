@@ -58,7 +58,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
      ttf-freefont \
      font-noto \
      libxml2 \
-     libxslt
+     libxslt \
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
