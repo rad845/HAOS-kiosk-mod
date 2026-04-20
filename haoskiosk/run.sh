@@ -621,23 +621,35 @@ if [ -n "$VNC_SERVER" ]; then
     x11vnc $X11VNC_OPTS 2> >(grep -v 'The VNC desktop is:' >&2)
 fi
 
-#### Start browser (or debug mode)  and wait/sleep
+################################################################################
+#### Start browser (or debug mode) and wait/sleep
 if [ "$DEBUG_MODE" != true ]; then
-    ### Run browser in the background
+    bashio::log.info "Preparing Chromium for launch..."
+    
+    # Usuwanie starych blokad sesji (naprawia błąd 'existing session')
+    rm -f /data/browser/SingletonLock
+    rm -f /data/browser/SingletonCookie
+    rm -f /data/browser/SingletonSocket
+
+    # Pierwsze uruchomienie przeglądarki
     $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
     bashio::log.info "Launching $BROWSER browser(PID=$!): $HA_URL/$HA_DASHBOARD"
 
-    ### Uproszczona pętla podtrzymująca (nie pozwoli dodatkowi wyjść)
+    # Pętla monitorująca proces
     while true; do
-        # Jeśli proces zniknie, spróbuj go zrestartować zamiast wychodzić
         if ! pgrep -x "chromium-browser" > /dev/null; then
-            bashio::log.warning "Chromium process lost, restarting..."
+            bashio::log.warning "Chromium process lost, cleaning locks and restarting in 5s..."
+            sleep 5
+            rm -f /data/browser/SingletonLock
             $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
+        else
+            # Jeśli proces żyje, po prostu czekamy
+            sleep 30
         fi
-        sleep 30
     done
 
 else  ### Debug mode
-    bashio::log.info "Entering debug mode (X & $WINMGR window manager but no $BROWSER browser)..."
+    bashio::log.info "Entering debug mode (X & Openbox window manager started, but no browser)..."
+    # Pozwala na wejście do kontenera przez SSH i ręczne testowanie
     exec sleep infinite
 fi
