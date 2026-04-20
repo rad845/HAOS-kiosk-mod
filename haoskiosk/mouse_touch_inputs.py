@@ -2701,7 +2701,7 @@ def _run_subprocess(args: str | Sequence[str], *, shell: bool | None = None, tim
         return result
 
     except subprocess.TimeoutExpired as e:
-        raise CommandError(f"Timeout for '{prog}' after {timeout}s [{"shell" if use_shell else "exec"}]: {description}") from e
+        raise CommandError(f"Timeout for '{prog}' after {timeout}s [{'shell' if use_shell else 'exec'}]: {description}") from e
     except FileNotFoundError as e:
         if use_shell:  # This usually means: binary not found OR syntax error in shell string
             raise CommandError(f"Program '{prog}' not found or shell syntax error: {description}") from e
@@ -2709,7 +2709,7 @@ def _run_subprocess(args: str | Sequence[str], *, shell: bool | None = None, tim
     except PermissionError as e:
         raise CommandError(f"Permission denied for '{prog}': {description}") from e
     except Exception as e:
-        raise CommandError(f"Failed to execute '{prog}' command [{"shell" if use_shell else "exec"}]: {description}") from e
+        raise CommandError(f"Failed to execute '{prog}' command [{'shell' if use_shell else 'exec'}]: {description}") from e
 
     return subprocess.CompletedProcess[str](args=args, returncode=1, stdout="", stderr=str(e),)
 
