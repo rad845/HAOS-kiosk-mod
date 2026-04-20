@@ -183,6 +183,8 @@ echo "$DBUS_SESSION_BUS_ADDRESS" >| /tmp/DBUS_SESSION_BUS_ADDRESS
 # Make available to subsequent shells
 echo "export DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS'" >> "$HOME/.profile"
 mkdir -p /var/run/dbus
+rm -f /var/run/dbus/pid
+dbus-uuidgen --ensure
 dbus-daemon --system --fork --readonly 2>/dev/null || true
 
 #### Hack to get writable /dev/tty0 for X
