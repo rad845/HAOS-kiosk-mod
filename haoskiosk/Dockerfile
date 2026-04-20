@@ -47,6 +47,9 @@ RUN apk update && apk upgrade && apk add --no-cache \
      pulseaudio-utils \
      x11vnc \
      chromium \
+     intel-media-driver \
+     libva-intel-driver \
+     mesa-va-gallium \
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
