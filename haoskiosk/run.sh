@@ -200,6 +200,9 @@ if ! udevd --daemon || ! udevadm trigger; then
     bashio::log.warning "WARNING: Failed to start udevd or trigger udev, input devices may not work"
 fi
 udevadm settle --timeout=10  #Wait for udev event processing to complete
+# Wymuszenie odświeżenia urządzeń wejściowych
+udevadm trigger --subsystem-match=input --action=add
+
 
 # Show discovered libinput devices
 echo "libinput list-devices found:"
