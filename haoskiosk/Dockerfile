@@ -59,8 +59,6 @@ RUN apk update && apk upgrade && apk add --no-cache \
      font-noto \
      libxml2 \
      libxslt
-
-     
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
