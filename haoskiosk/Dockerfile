@@ -52,6 +52,15 @@ RUN apk update && apk upgrade && apk add --no-cache \
      mesa-va-gallium \
      dbus \
      dbus-x11 \
+     nss \
+     nspr \
+     freetype \
+     ttf-freefont \
+     font-noto \
+     libxml2 \
+     libxslt
+
+     
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
