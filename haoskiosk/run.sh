@@ -82,7 +82,7 @@ trap cleanup HUP INT QUIT ABRT TERM EXIT
 
 ################################################################################
 BROWSER="chromium-browser"
-BROWSER_FLAGS="--kiosk --no-sandbox --user-data-dir=/data/browser --ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy --use-gl=egl"
+BROWSER_FLAGS="--kiosk --no-sandbox --user-data-dir=/data/browser --disable-gpu --disable-software-rasterizer --no-first-run"
 ################################################################################
 #### Get config variables from HA add-on & set environment variables
 load_config_var() {
@@ -182,6 +182,8 @@ export DBUS_SESSION_BUS_ADDRESS
 echo "$DBUS_SESSION_BUS_ADDRESS" >| /tmp/DBUS_SESSION_BUS_ADDRESS
 # Make available to subsequent shells
 echo "export DBUS_SESSION_BUS_ADDRESS='$DBUS_SESSION_BUS_ADDRESS'" >> "$HOME/.profile"
+mkdir -p /var/run/dbus
+dbus-daemon --system --fork --readonly 2>/dev/null || true
 
 #### Hack to get writable /dev/tty0 for X
 # Note first need to delete /dev/tty0 since X won't start if it is there,
