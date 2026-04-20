@@ -50,6 +50,8 @@ RUN apk update && apk upgrade && apk add --no-cache \
      intel-media-driver \
      libva-intel-driver \
      mesa-va-gallium \
+     dbus \
+     dbus-x11 \
    && rm -rf /var/cache/apk/*
 
 #===============================================================================
