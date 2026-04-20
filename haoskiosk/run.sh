@@ -82,8 +82,7 @@ trap cleanup HUP INT QUIT ABRT TERM EXIT
 
 ################################################################################
 BROWSER="chromium-browser"
-BROWSER_FLAGS="--kiosk --no-sandbox --user-data-dir=/data/browser --no-first-run 
-
+BROWSER_FLAGS="--kiosk --no-sandbox --user-data-dir=/data/browser --ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy --use-gl=egl"
 ################################################################################
 #### Get config variables from HA add-on & set environment variables
 load_config_var() {
