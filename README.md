@@ -1,4 +1,4 @@
-# HAOS-kiosk-mod v8
+# HAOS-kiosk-mod v9
 
 Display HA dashboards in kiosk mode directly on your HAOS server.
 
