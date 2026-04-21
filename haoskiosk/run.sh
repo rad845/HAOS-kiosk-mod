@@ -698,17 +698,23 @@ if [ "$DEBUG_MODE" != true ]; then
     
     bashio::log.info "Auto-login completed"
     
-    # MONITOROWANIE PROCESU (uproszczone)
+    # MONITOROWANIE PROCESU
     while true; do
-        if ! pgrep -x "chromium-browser" > /dev/null; then
+        # Sprawdź czy JAKAKOLWIEK instancja Chromium działa
+        if ! pgrep -f "chromium-browser" > /dev/null; then
             bashio::log.warning "Chromium lost, restarting in 5s..."
             sleep 5
+            
+            # Wyczyść blokady przed restartem
+            rm -f /data/browser/SingletonLock 2>/dev/null
+            rm -f /data/browser/SingletonCookie 2>/dev/null
+            rm -f /data/browser/SingletonSocket 2>/dev/null
             
             $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" \
                 2>> /tmp/chromium_error.log &
             bashio::log.info "Chromium restarted (PID: $!)"
         fi
-        sleep 30
+        sleep 10  # Sprawdzaj częściej, ale nie restartuj bez potrzeby
     done
 
 else  ### Debug mode
