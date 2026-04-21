@@ -82,7 +82,27 @@ trap cleanup HUP INT QUIT ABRT TERM EXIT
 
 ################################################################################
 BROWSER="chromium-browser"
-BROWSER_FLAGS="--kiosk --no-sandbox --disable-setuid-sandbox --disable-seccomp-filter-sandbox --disable-dev-shm-usage --user-data-dir=/data/browser --disable-gpu --no-first-run"
+BROWSER_FLAGS="--kiosk \
+--no-sandbox \
+--disable-setuid-sandbox \
+--disable-seccomp-filter-sandbox \
+--disable-dev-shm-usage \
+--user-data-dir=/data/browser \
+--disable-gpu \
+--no-first-run \
+--disable-crash-reporter \
+--disable-breakpad \
+--disable-sync \
+--disable-default-apps \
+--disable-extensions \
+--disable-background-mode \
+--disable-background-networking \
+--disable-translate \
+--disable-infobars \
+--disable-session-crashed-bubble \
+--disable-component-update \
+--disable-pdf-viewer \
+--disable-features=TranslateUI"
 ################################################################################
 #### Get config variables from HA add-on & set environment variables
 load_config_var() {
@@ -638,26 +658,61 @@ if [ "$DEBUG_MODE" != true ]; then
     $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
     bashio::log.info "Launching $BROWSER browser(PID=$!): $HA_URL/$HA_DASHBOARD"
 
- # Pętla monitorująca proces
+  # Pętla monitorująca proces
+    MAX_RESTARTS=5
+    RESTART_COUNT=0
+    RESTART_WINDOW=60
+    LAST_RESTART=$(date +%s)
+
     while true; do
         if ! pgrep -x "chromium-browser" > /dev/null; then
-            bashio::log.warning "Chromium process lost, cleaning locks and restarting in 5s..."
+            CURRENT_TIME=$(date +%s)
             
-            # 1. PEWNE ZAMKNIĘCIE I CZYSZCZENIE
+            # Reset licznika restartów, jeśli minęło okno czasowe
+            if [ $((CURRENT_TIME - LAST_RESTART)) -gt $RESTART_WINDOW ]; then
+                RESTART_COUNT=0
+            fi
+            
+            # Sprawdzenie, czy nie przekroczono limitu restartów
+            if [ $RESTART_COUNT -ge $MAX_RESTARTS ]; then
+                bashio::log.error "Too many restarts ($MAX_RESTARTS) in ${RESTART_WINDOW}s. Exiting watchdog to prevent loop."
+                exit 1
+            fi
+            
+            bashio::log.warning "Chromium process lost (attempt $((RESTART_COUNT+1))/$MAX_RESTARTS). Cleaning locks and restarting in 5s..."
+            
+            # 1. BEZPIECZNE CZYSZCZENIE (USUWANIE TYLKO BLOKAD, NIE CAŁEGO KATALOGU PROFILU)
             pkill -9 chromium 2>/dev/null || true
-            rm -rf /data/browser/Singleton*
-            rm -rf /tmp/.com.google.Chrome*
-            rm -rf /tmp/.org.chromium.Chromium*
+            
+            # Usuwanie tylko konkretnych plików blokad, aby nie naruszyć profilu
+            rm -f /data/browser/SingletonLock 2>/dev/null
+            rm -f /data/browser/SingletonCookie 2>/dev/null
+            rm -f /data/browser/SingletonSocket 2>/dev/null
+            rm -f /data/browser/Local\ State 2>/dev/null  # Czasami też powoduje problemy
+            
+            # Czyszczenie tymczasowych plików w /tmp
+            rm -rf /tmp/.com.google.Chrome* 2>/dev/null
+            rm -rf /tmp/.org.chromium.Chromium* 2>/dev/null
+            
+            # Upewnienie się, że katalog profilu istnieje
+            mkdir -p /data/browser
             
             # 2. ODŚWIEŻENIE DOTYKU
             udevadm trigger --subsystem-match=input --action=add >/dev/null 2>&1 || true
             
             sleep 5
 
-            # 3. RESTART (używamy cudzysłowów, żeby flagi przeszły poprawnie)
-            $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" &
+            # 3. RESTART Z DIAGNOSTYKĄ
+            bashio::log.info "Restarting Chromium..."
+            # Uruchomienie Chromium w tle z logowaniem błędów do osobnego pliku
+            $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" 2>> /tmp/chromium_error.log &
+            
+            # Zwiększenie licznika restartów i zapisanie czasu
+            RESTART_COUNT=$((RESTART_COUNT + 1))
+            LAST_RESTART=$CURRENT_TIME
         else
-            # Jeśli proces żyje, po prostu czekamy
+            # Jeśli proces działa, reset licznika restartów
+            RESTART_COUNT=0
             sleep 30
         fi
     done
