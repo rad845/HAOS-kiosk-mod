@@ -659,38 +659,57 @@ if [ "$DEBUG_MODE" != true ]; then
 
     bashio::log.info "===== DIAGNOSTYKA ====="
     bashio::log.info "BROWSER: $BROWSER"
-    bashio::log.info "BROWSER_FLAGS: $BROWSER_FLAGS"
     bashio::log.info "URL: $HA_URL/$HA_DASHBOARD"
     bashio::log.info "========================="
     
-    # RĘCZNE URUCHOMIENIE Z PEŁNYM LOGOWANIEM
-    bashio::log.info "Starting Chromium with full logging to /tmp/chromium_error.log"
-    
+    # URUCHOMIENIE CHROMIUM
+    bashio::log.info "Starting Chromium..."
     $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" \
-        --enable-logging=stderr \
-        --v=2 \
         2> /tmp/chromium_error.log &
-    
     BROWSER_PID=$!
     bashio::log.info "Chromium PID: $BROWSER_PID"
     
-    # CZEKAJ 15 SEKUND - NIE RESTARTUJ
-    sleep 15
+    # CZEKAJ NA ZAŁADOWANIE STRONY LOGOWANIA
+    bashio::log.info "Waiting for login page (${LOGIN_DELAY}s + 8s)..."
+    sleep "$LOGIN_DELAY"
+    sleep 8
     
-    # Sprawdź czy proces żyje
-    if kill -0 $BROWSER_PID 2>/dev/null; then
-        bashio::log.info "Chromium is RUNNING (PID: $BROWSER_PID)"
-    else
-        bashio::log.error "Chromium DIED - check /tmp/chromium_error.log"
-        bashio::log.error "Last 10 lines of error log:"
-        tail -10 /tmp/chromium_error.log 2>/dev/null | while read line; do
-            bashio::log.error "  $line"
-        done
-    fi
+    # AUTOMATYCZNE LOGOWANIE (xdotool)
+    bashio::log.info "===== AUTO-LOGIN ====="
     
-    # NIE RESTARTUJ - PO PROSTU CZEKAJ (dla diagnostyki)
-    bashio::log.info "Entering infinite sleep for diagnostics. Container will stay alive."
-    exec sleep infinity
+    # Wpisz nazwę użytkownika
+    xdotool type --delay 100 "$HA_USERNAME" 2>/dev/null
+    sleep 0.5
+    
+    # Tab do hasła
+    xdotool key Tab 2>/dev/null
+    sleep 0.3
+    
+    # Wpisz hasło
+    xdotool type --delay 100 "$HA_PASSWORD" 2>/dev/null
+    sleep 0.5
+    
+    # Zatwierdź
+    xdotool key Return 2>/dev/null
+    sleep 1
+    
+    # "Remember this device" jeśli się pojawi
+    xdotool key Return 2>/dev/null || true
+    
+    bashio::log.info "Auto-login completed"
+    
+    # MONITOROWANIE PROCESU (uproszczone)
+    while true; do
+        if ! pgrep -x "chromium-browser" > /dev/null; then
+            bashio::log.warning "Chromium lost, restarting in 5s..."
+            sleep 5
+            
+            $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" \
+                2>> /tmp/chromium_error.log &
+            bashio::log.info "Chromium restarted (PID: $!)"
+        fi
+        sleep 30
+    done
 
 else  ### Debug mode
     bashio::log.info "Entering debug mode..."
