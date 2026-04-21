@@ -649,10 +649,14 @@ fi
 if [ "$DEBUG_MODE" != true ]; then
     bashio::log.info "Preparing Chromium for launch..."
     
+    # Upewnienie się, że katalog profilu istnieje
+    mkdir -p /data/browser
+    
     # Usuwanie starych blokad sesji (naprawia błąd 'existing session')
-    rm -f /data/browser/SingletonLock
-    rm -f /data/browser/SingletonCookie
-    rm -f /data/browser/SingletonSocket
+    rm -f /data/browser/SingletonLock 2>/dev/null
+    rm -f /data/browser/SingletonCookie 2>/dev/null
+    rm -f /data/browser/SingletonSocket 2>/dev/null
+    rm -f /data/browser/Local\ State 2>/dev/null
 
     # Pierwsze uruchomienie przeglądarki
     $BROWSER ${BROWSER_FLAGS:+$BROWSER_FLAGS} "$HA_URL/$HA_DASHBOARD" &
