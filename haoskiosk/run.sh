@@ -674,47 +674,34 @@ if [ "$DEBUG_MODE" != true ]; then
     sleep "$LOGIN_DELAY"
     sleep 8
     
-    # AUTOMATYCZNE LOGOWANIE (xdotool)
+    # AUTOMATYCZNE LOGOWANIE
     bashio::log.info "===== AUTO-LOGIN ====="
-    
-    # Wpisz nazwę użytkownika
     xdotool type --delay 100 "$HA_USERNAME" 2>/dev/null
     sleep 0.5
-    
-    # Tab do hasła
     xdotool key Tab 2>/dev/null
     sleep 0.3
-    
-    # Wpisz hasło
     xdotool type --delay 100 "$HA_PASSWORD" 2>/dev/null
     sleep 0.5
-    
-    # Zatwierdź
     xdotool key Return 2>/dev/null
     sleep 1
-    
-    # "Remember this device" jeśli się pojawi
     xdotool key Return 2>/dev/null || true
-    
     bashio::log.info "Auto-login completed"
     
-    # MONITOROWANIE PROCESU
+    # MONITOROWANIE PROCESU - używając PID
     while true; do
-        # Sprawdź czy JAKAKOLWIEK instancja Chromium działa
-        if ! pgrep -f "chromium-browser" > /dev/null; then
-            bashio::log.warning "Chromium lost, restarting in 5s..."
+        if ! kill -0 $BROWSER_PID 2>/dev/null; then
+            bashio::log.warning "Chromium (PID: $BROWSER_PID) lost, restarting..."
             sleep 5
             
-            # Wyczyść blokady przed restartem
-            rm -f /data/browser/SingletonLock 2>/dev/null
-            rm -f /data/browser/SingletonCookie 2>/dev/null
-            rm -f /data/browser/SingletonSocket 2>/dev/null
+            # Wyczyść blokady
+            rm -f /data/browser/Singleton* 2>/dev/null
             
-            $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" \
-                2>> /tmp/chromium_error.log &
-            bashio::log.info "Chromium restarted (PID: $!)"
+            # Restart
+            $BROWSER $BROWSER_FLAGS "$HA_URL/$HA_DASHBOARD" &
+            BROWSER_PID=$!
+            bashio::log.info "Chromium restarted (PID: $BROWSER_PID)"
         fi
-        sleep 10  # Sprawdzaj częściej, ale nie restartuj bez potrzeby
+        sleep 10
     done
 
 else  ### Debug mode
