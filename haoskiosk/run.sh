@@ -532,13 +532,18 @@ if [[ "$ONSCREEN_KEYBOARD" = true && -n "$SCREEN_WIDTH" && -n "$SCREEN_HEIGHT" ]
     dconf write /org/onboard/layout "'/usr/share/onboard/layouts/Small.onboard'"
     dconf write /org/onboard/theme "'/usr/share/onboard/themes/Blackboard.theme'"
     dconf write /org/onboard/theme-settings/color-scheme "'/usr/share/onboard/themes/Charcoal.colors'"
-    dconf write /org/onboard/keyboard/show-click-buttons true  # Show buttons on keyboard for left/middle/right click & drag
+    dconf write /org/onboard/keyboard/show-click-buttons true
 
     # Behavior settings
-    dconf write /org/onboard/auto-show/enabled true  # Auto-show
-    dconf write /org/onboard/auto-show/tablet-mode-detection-enabled false  # Show keyboard only in tablet mode
-    dconf write /org/onboard/window/force-to-top true  # Always on top
-    gsettings set org.gnome.desktop.interface toolkit-accessibility true  # Disable gnome accessibility popup
+    dconf write /org/onboard/auto-show/enabled true
+    dconf write /org/onboard/auto-show/tablet-mode-detection-enabled false
+    dconf write /org/onboard/window/force-to-top true
+    
+    # Auto-hide after inactivity
+    dconf write /org/onboard/auto-show/hide-on-inactivity true
+    dconf write /org/onboard/auto-show/inactivity-time 5
+    
+    gsettings set org.gnome.desktop.interface toolkit-accessibility trueup
 
     # Default landscape geometry
     dconf write /org/onboard/window/landscape/height "$LAND_HEIGHT"
